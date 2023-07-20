@@ -12,19 +12,26 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public Text BestScoreText;
-    public GameObject GameOverText;
-    
+    public string bestPl;
+    public int bestSc;
+
+    public GameObject GameOverBox;
+    private string m_player;
     private bool m_Started = false;
     private int m_Points;
     
-    private bool m_GameOver = false;
+//    private bool m_GameOver = false;
 
     
     // Start is called before the first frame update
     void Start()
     {
-        
-        
+        bestPl = GameManager.Instance.BestPlayer;
+        bestSc = GameManager.Instance.BestScore;
+        m_player = GameManager.Instance.playerName;
+
+        BestScoreText.text = $"Best Player : {bestPl} => Score {bestSc}";
+        ScoreText.text = $"Player {m_player} - Score : {m_Points}";
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -56,24 +63,46 @@ public class MainManager : MonoBehaviour
                 Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange);
             }
         }
-        else if (m_GameOver)
+/*        else if (m_GameOver)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
-        }
+        }  */
     }
 
+    public void playAgain()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+    
+    
+    public void BackToMenu ()
+    {
+        SceneManager.LoadScene(0);
+    }
     void AddPoint(int point)
     {
         m_Points += point;
         ScoreText.text = $"Player {GameManager.Instance.playerName} - Score : {m_Points}";
+        if (m_Points > bestSc)
+        {
+            UpdateBestScore();
+        } 
+    }
+
+    private void UpdateBestScore()
+    {
+        bestPl = m_player;
+        bestSc = m_Points;
+        BestScoreText.text = $"Best Player : {bestPl} => Score {bestSc}";
+        GameManager.Instance.UpdateBestPlayer(bestPl, bestSc);
     }
 
     public void GameOver()
     {
-        m_GameOver = true;
-        GameOverText.SetActive(true);
+//        m_GameOver = true;
+        GameOverBox.SetActive(true);
     }
 }
